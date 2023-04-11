@@ -1,0 +1,32 @@
+{
+    "name": "coroq/http-kernel",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Ozawa Masayuki",
+            "email": "ozawa@coroq.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.2",
+        "lib-pcre": "*",
+        "psr/http-message": "^2.0",
+        "psr/http-factory": "^1.0",
+        "psr/log": "^1.1",
+        "coroq/flow": "dev-master"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^8.5",
+        "phan/phan": "^3.0"
+    },
+    "scripts": {
+        "phan": "@php -n -d extension=ast.so -d extension=json.so -d extension=tokenizer.so vendor/bin/phan --no-progress-bar || :",
+        "test": "@php vendor/bin/phpunit test/"
+    },
+    "autoload": {
+        "psr-4": {
+            "Coroq\\HttpKernel\\": "src/"
+        }
+    }
+}
