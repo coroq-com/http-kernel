@@ -18,10 +18,10 @@
     },
     "require-dev": {
         "phpunit/phpunit": "^8.5",
-        "phan/phan": "^3.0"
+        "phan/phan": "^5.4"
     },
     "scripts": {
-        "phan": "@php -n -d extension=ast.so -d extension=json.so -d extension=tokenizer.so vendor/bin/phan --no-progress-bar || :",
+        "phan": "@php -n -d extension=ast.so -d extension=json.so -d extension=tokenizer.so vendor/bin/phan || :",
         "test": "@php vendor/bin/phpunit test/"
     },
     "autoload": {
