@@ -1,5 +1,5 @@
 <?php
-namespace Coroq\HttpKernel\Integration\Flow;
+namespace Coroq\HttpKernel;
 
 use Coroq\HttpKernel\RouterInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -31,7 +31,7 @@ class Router implements RouterInterface {
     $basePath = ltrim($basePath, "/");
     $path = $request->getUri()->getPath();
     $path = ltrim($path, "/");
-    if (strpos($path, $basePath) !== 0) {
+    if ($basePath != "" && strpos($path, $basePath) !== 0) {
       throw new RuntimeException(); // TODO
     }
     $path = substr($path, strlen($basePath));
