@@ -1,5 +1,5 @@
 <?php
-namespace Coroq\HttpKernel;
+namespace Coroq\HttpKernel\Basic;
 
 class ViewRenderer {
   /** @var string */

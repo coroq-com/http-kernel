@@ -1,5 +1,5 @@
 <?php
-namespace Coroq\HttpKernel;
+namespace Coroq\HttpKernel\Component;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 

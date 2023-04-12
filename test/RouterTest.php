@@ -1,11 +1,11 @@
 <?php
-use Coroq\HttpKernel\Router;
+use Coroq\HttpKernel\Basic\Router;
 use Nyholm\Psr7\ServerRequest;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
- * @covers Coroq\HttpKernel\Router
+ * @covers Coroq\HttpKernel\Basic\Router
  */
 class RouterTest extends TestCase {
   private function makeRequest(string $path): ServerRequestInterface {

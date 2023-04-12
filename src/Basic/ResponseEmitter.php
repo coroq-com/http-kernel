@@ -1,5 +1,7 @@
 <?php
-namespace Coroq\HttpKernel;
+namespace Coroq\HttpKernel\Basic;
+
+use Coroq\HttpKernel\Component\ResponseEmitterInterface;
 use Psr\Http\Message\ResponseInterface;
 
 class ResponseEmitter implements ResponseEmitterInterface {

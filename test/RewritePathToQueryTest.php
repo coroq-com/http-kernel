@@ -1,11 +1,11 @@
 <?php
-use Coroq\HttpKernel\RequestRewriterRule\PathToQuery;
+use Coroq\HttpKernel\Basic\RequestRewriterRule\PathToQuery;
 use Nyholm\Psr7\ServerRequest;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
- * @covers Coroq\HttpKernel\RequestRewriterRule\PathToQuery;
+ * @covers Coroq\HttpKernel\Basic\RequestRewriterRule\PathToQuery;
  */
 class RewritePathToQueryTest extends TestCase {
   private function makeRequest(string $path): ServerRequestInterface {

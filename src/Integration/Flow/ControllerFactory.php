@@ -1,7 +1,7 @@
 <?php
 namespace Coroq\HttpKernel\Integration\Flow;
 
-use Coroq\HttpKernel\ControllerFactoryInterface;
+use Coroq\HttpKernel\Component\ControllerFactoryInterface;
 use Coroq\Flow\Flow;
 use Coroq\HttpKernel\Integration\Flow\ControllerFactory\Instantiator\InstantiatorInterface;
 use Coroq\HttpKernel\Integration\Flow\ControllerFactory\Instantiator\ViaNewOperator;

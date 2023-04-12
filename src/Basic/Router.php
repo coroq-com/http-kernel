@@ -1,7 +1,7 @@
 <?php
-namespace Coroq\HttpKernel;
+namespace Coroq\HttpKernel\Basic;
 
-use Coroq\HttpKernel\RouterInterface;
+use Coroq\HttpKernel\Component\RouterInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use RuntimeException;
 

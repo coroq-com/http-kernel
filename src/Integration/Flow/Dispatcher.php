@@ -1,7 +1,7 @@
 <?php
 namespace Coroq\HttpKernel\Integration\Flow;
 
-use Coroq\HttpKernel\DispatcherInterface;
+use Coroq\HttpKernel\Component\DispatcherInterface;
 use Coroq\Flow\Flow;
 use DomainException;
 use InvalidArgumentException;

@@ -1,6 +1,12 @@
 <?php
 namespace Coroq\HttpKernel;
 
+use Coroq\HttpKernel\Component\ControllerFactoryInterface;
+use Coroq\HttpKernel\Component\DispatcherInterface;
+use Coroq\HttpKernel\Component\RequestRewriterInterface;
+use Coroq\HttpKernel\Component\ResponseEmitterInterface;
+use Coroq\HttpKernel\Component\ResponseRewriterInterface;
+use Coroq\HttpKernel\Component\RouterInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
