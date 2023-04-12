@@ -3,9 +3,10 @@ namespace Coroq\HttpKernel\Integration\Flow;
 
 use Coroq\HttpKernel\ControllerFactoryInterface;
 use Coroq\Flow\Flow;
+use Coroq\HttpKernel\Integration\Flow\ControllerFactory\Instantiator\InstantiatorInterface;
+use Coroq\HttpKernel\Integration\Flow\ControllerFactory\Instantiator\ViaNewOperator;
 use InvalidArgumentException;
 use LogicException;
-use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use ReflectionMethod;
 
@@ -13,15 +14,16 @@ class ControllerFactory implements ControllerFactoryInterface {
   /** @var ?Flow */
   private $flow;
 
-  /** @var ?ContainerInterface */
-  private $diContainer;
+  /** @var InstantiatorInterface */
+  private $instantiator;
 
   public function __construct(?Flow $flow = null) {
     $this->flow = $flow;
+    $this->instantiator = new ViaNewOperator();
   }
 
-  public function setContainer(?ContainerInterface $diContainer): void {
-    $this->diContainer = $diContainer;
+  public function setInstantiator(InstantiatorInterface $instantiator): void {
+    $this->instantiator = $instantiator;
   }
 
   public function createController(ServerRequestInterface $request, $route): Flow {
@@ -35,65 +37,52 @@ class ControllerFactory implements ControllerFactoryInterface {
       $flow = new Flow();
     }
     foreach ($route as $waypoint) {
-      $callable = $this->instantiate($waypoint);
-      $flow->appendStep($callable);
+      $step = $this->instantiate($waypoint);
+      $flow->appendStep($step);
     }
     return $flow;
   }
 
   private function instantiate($waypoint): callable {
-    $step = $this->getFromDiContainer($waypoint);
-    if ($step) {
-      if (!is_callable($step)) {
-        throw new InvalidArgumentException("$waypoint in DI Container was not a callable.");
-      }
-      return $step;
-    }
-    if (!is_callable($waypoint)) {
-      throw new InvalidArgumentException("$waypoint is not a callable.");
-    }
-    if (is_string($waypoint)) {
-      return $this->instantiateString($waypoint);
-    }
-    if (is_array($waypoint)) {
-      return $this->instantiateArray($waypoint);
+    if (is_callable($waypoint)) {
+      return $this->instantiateCallable($waypoint);
     }
     return $waypoint;
   }
 
-  private function getFromDiContainer(string $id) {
-    if (!$this->diContainer) {
-      return null;
+  private function instantiateCallable(callable $callable): callable {
+    if (is_string($callable)) {
+      return $this->instantiateStringCallable($callable);
     }
-    if (!$this->diContainer->has($id)) {
-      return null;
+    if (is_array($callable)) {
+      return $this->instantiateArrayCallable($callable);
     }
-    return $this->diContainer->get($id);
+    return $callable;
   }
 
-  private function instantiateString(string $callable) {
+  private function instantiateStringCallable(string $callable): callable {
     $arrayCallable = explode('::', $callable);
     if (count($arrayCallable) != 2) {
       return $callable;
     }
-    return $this->instantiateArray($arrayCallable);
+    return $this->instantiateArrayCallable($arrayCallable);
   }
 
-  private function instantiateArray(array $callable) {
-    $method = new ReflectionMethod($callable[0], $callable[1]);
-    if ($method->getModifiers() & ReflectionMethod::IS_STATIC) {
+  private function instantiateArrayCallable(array $callable): callable {
+    list($class, $method) = $callable;
+    if (!is_string($class)) {
       return $callable;
     }
-    $class = $method->getDeclaringClass();
-    $className = $class->getName();
-    $instance = $this->getFromDiContainer($className);
-    if (!$instance) {
-      $constructor = $class->getConstructor();
-      if ($constructor->getNumberOfParameters()) {
-        throw new LogicException('Could not create an instance of ' . $callable[0]);
-      }
-      $instance = $class->newInstance();
+    // static method
+    $methodInfo = new ReflectionMethod($class, $method);
+    if ($methodInfo->getModifiers() & ReflectionMethod::IS_STATIC) {
+      return $callable;
     }
-    return [$instance, $method->getName()];
+    // $callable was [classNameString, methodNameString]
+    $instance = $this->instantiator->instantiate($class);
+    if (!$instance) {
+      throw new LogicException("Could not create an instance of $class");
+    }
+    return [$instance, $method];
   }
 }
