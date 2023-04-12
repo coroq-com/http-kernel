@@ -1,7 +1,7 @@
 <?php
-namespace Coroq\HttpKernel\RequestRewriter;
+namespace Coroq\HttpKernel;
 
-use Coroq\HttpKernel\RequestRewriter\Rule\RuleInterface;
+use Coroq\HttpKernel\RequestRewriterRule\RuleInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 class RequestRewriter {
