@@ -13,6 +13,7 @@
         "lib-pcre": "*",
         "psr/http-message": "^1.0||^2.0",
         "psr/http-factory": "^1.0",
+        "psr/container": "^2.0",
         "psr/log": "^1.1",
         "coroq/flow": "dev-master"
     },
