@@ -1,12 +1,11 @@
 <?php
 namespace Coroq\HttpKernel\Component;
 
-use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 interface RouterInterface {
   /**
-   * @return mixed|ResponseInterface
+   * @return mixed
    */
   public function route(ServerRequestInterface $request);
 }

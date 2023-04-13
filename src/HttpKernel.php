@@ -7,6 +7,7 @@ use Coroq\HttpKernel\Component\RequestRewriterInterface;
 use Coroq\HttpKernel\Component\ResponseEmitterInterface;
 use Coroq\HttpKernel\Component\ResponseRewriterInterface;
 use Coroq\HttpKernel\Component\RouterInterface;
+use Coroq\HttpKernel\Exception\HttpExceptionInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
@@ -51,11 +52,21 @@ class HttpKernel {
     $this->logger =$logger;
   }
 
-  public function handleRequest(ServerRequestInterface $request): ResponseInterface {
+  public function handleRequest(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface {
     $this->logRequest($request, "Request");
-    //
-    $response = $this->toResponse($request);
-    $this->logResponse($response, "Response");
+    try {
+      $response = $this->createAndExecuteController($request, $response);
+      $this->logResponse($response, "Response");
+    }
+    catch (HttpExceptionInterface $exception) {
+      $response = $response->withStatus(
+        $exception->getStatusCode(),
+        $exception->getReasonPhrase()
+      );
+      foreach ($exception->getHeaders() as $name => $value) {
+        $response = $response->withHeader($name, $value);
+      }
+    }
 
     // Rewrite response
     if ($this->responseRewriter) {
@@ -71,7 +82,7 @@ class HttpKernel {
     return $response;
   }
 
-  private function toResponse(ServerRequestInterface $request): ResponseInterface {
+  private function createAndExecuteController(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface {
     // Rewrite request
     if ($this->requestRewriter) {
       $request = $this->requestRewriter->rewriteRequest($request);
@@ -102,7 +113,7 @@ class HttpKernel {
     }
 
     // Dispatch
-    return $this->dispatcher->dispatch($request, $route, $controller);
+    return $this->dispatcher->dispatch($request, $route, $controller, $response);
   }
 
   public function setLogger(LoggerInterface $logger): void {

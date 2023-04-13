@@ -9,5 +9,5 @@ interface DispatcherInterface {
    * @param mixed $route
    * @param mixed $controller
    */
-  public function dispatch(ServerRequestInterface $request, $route, $controller): ResponseInterface;
+  public function dispatch(ServerRequestInterface $request, $route, $controller, ResponseInterface $response): ResponseInterface;
 }
