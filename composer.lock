@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6d8adbb92f76b34510eb854427c335a0",
+    "content-hash": "60946666f79cb41003ae446b34010c18",
     "packages": [
         {
             "name": "coroq/flow",
