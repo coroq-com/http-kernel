@@ -3,11 +3,15 @@ namespace Coroq\HttpKernel\Basic;
 
 use Coroq\HttpKernel\Component\RouterInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Log\LoggerInterface;
 use RuntimeException;
 
 class Router implements RouterInterface {
   /** @var array<mixed> */
   private $map;
+
+  /** @var ?LoggerInterface */
+  private $logger;
 
   /**
    * @param array<mixed> $map
@@ -16,11 +20,16 @@ class Router implements RouterInterface {
     $this->map = $map;
   }
 
+  public function setLogger(?LoggerInterface $logger): void {
+    $this->logger = $logger;
+  }
+
   /**
    * @return array<int,mixed>
    */
   public function route(ServerRequestInterface $request, string $basePath = "/"): array {
     $waypoints = $this->getWaypoints($request, $basePath);
+    $this->logDebug("waypoints", $waypoints);
     return $this->routeHelper([], $waypoints, $this->map, "");
   }
 
@@ -53,6 +62,7 @@ class Router implements RouterInterface {
     foreach ($map as $mapIndex => $mapItem) {
       if (is_int($mapIndex)) {
         if ($mapItem == "*") {
+          $this->logDebug("Matched catch-all (*)");
           return $route;
         }
         if (is_string($mapItem) && preg_match('#(.+)::$#', $mapItem, $matches)) {
@@ -103,5 +113,14 @@ class Router implements RouterInterface {
       }
     }
     return $mapItem;
+  }
+
+  /**
+   * @param array<mixed> $context
+   */
+  private function logDebug(string $message, array $context = []): void {
+    if ($this->logger) {
+      $this->logger->debug("Router: $message", $context);
+    }
   }
 }
