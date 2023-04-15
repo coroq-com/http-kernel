@@ -43,46 +43,72 @@ class ControllerFactory implements ControllerFactoryInterface {
     return $flow;
   }
 
+  /**
+   * @param mixed $waypoint
+   */
   private function instantiate($waypoint): callable {
+    if (is_string($waypoint)) {
+      return $this->instantiateStringWaypoint($waypoint);
+    }
+    if (is_array($waypoint)) {
+      return $this->instantiateArrayWaypoint($waypoint);
+    }
     if (is_callable($waypoint)) {
-      return $this->instantiateCallable($waypoint);
+      return $waypoint;
     }
-    return $waypoint;
+    if (is_object($waypoint)) {
+      $class = get_class($waypoint);
+      throw new InvalidArgumentException("Invalid waypoint: $class object");
+    }
+    $type = gettype($waypoint);
+    throw new InvalidArgumentException("Invalid waypoint: $waypoint ($type)");
   }
 
-  private function instantiateCallable(callable $callable): callable {
-    if (is_string($callable)) {
-      return $this->instantiateStringCallable($callable);
+  private function instantiateStringWaypoint(string $waypoint): callable {
+    $arrayWaypoint = explode('::', $waypoint);
+    if (count($arrayWaypoint) != 2) {
+      if (is_callable($waypoint)) {
+        return $waypoint;
+      }
+      throw new InvalidArgumentException("Invalid waypoint: $waypoint");
     }
-    if (is_array($callable)) {
-      return $this->instantiateArrayCallable($callable);
-    }
-    return $callable;
+    return $this->instantiateArrayWaypoint($arrayWaypoint);
   }
 
-  private function instantiateStringCallable(string $callable): callable {
-    $arrayCallable = explode('::', $callable);
-    if (count($arrayCallable) != 2) {
-      return $callable;
+  /**
+   * @param array<mixed> $waypoint
+   */
+  private function instantiateArrayWaypoint(array $waypoint): callable {
+    if (count($waypoint) != 2) {
+      throw new InvalidArgumentException("Invalid waypoint: " . print_r($waypoint, true));
     }
-    return $this->instantiateArrayCallable($arrayCallable);
-  }
-
-  private function instantiateArrayCallable(array $callable): callable {
-    list($class, $method) = $callable;
-    if (!is_string($class)) {
-      return $callable;
+    list($class, $method) = $waypoint;
+    if (is_object($class)) {
+      if (is_callable($waypoint)) {
+        return $waypoint;
+      }
+      throw new InvalidArgumentException("Invalid waypoint: " . get_class($class));
+    }
+    if (!is_string($class) || !is_string($method)) {
+      throw new InvalidArgumentException("Invalid waypoint: " . print_r($waypoint, true));
     }
     // static method
     $methodInfo = new ReflectionMethod($class, $method);
     if ($methodInfo->getModifiers() & ReflectionMethod::IS_STATIC) {
-      return $callable;
+      if (is_callable($waypoint)) {
+        return $waypoint;
+      }
+      throw new InvalidArgumentException("Invalid waypoint: " . join("::", $waypoint));
     }
     // $callable was [classNameString, methodNameString]
     $instance = $this->instantiator->instantiate($class);
     if (!$instance) {
-      throw new LogicException("Could not create an instance of $class");
+      throw new LogicException("Invalid waypoint: Could not create an instance of $class");
     }
-    return [$instance, $method];
+    $instanceAndMethod = [$instance, $method];
+    if (!is_callable($instanceAndMethod)) {
+      throw new LogicException("Invalid waypoint: " . join("::", $waypoint));
+    }
+    return $instanceAndMethod;
   }
 }
