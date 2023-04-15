@@ -7,20 +7,63 @@
     "content-hash": "60946666f79cb41003ae446b34010c18",
     "packages": [
         {
+            "name": "coroq/callable-reflector",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/coroq-com/callable-reflector.git",
+                "reference": "f6d61d71a8275762120c536359d92b8e46c5c8ee"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/coroq-com/callable-reflector/zipball/f6d61d71a8275762120c536359d92b8e46c5c8ee",
+                "reference": "f6d61d71a8275762120c536359d92b8e46c5c8ee",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.2"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^8.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Coroq\\CallableReflector\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ozawa Masayuki",
+                    "email": "ozawa@coroq.com"
+                }
+            ],
+            "support": {
+                "issues": "https://github.com/coroq-com/callable-reflector/issues",
+                "source": "https://github.com/coroq-com/callable-reflector/tree/v1.0.0"
+            },
+            "time": "2023-04-15T14:20:40+00:00"
+        },
+        {
             "name": "coroq/flow",
             "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ozami/coroq-flow.git",
-                "reference": "379117b1e52c9a1551219d046314ccd680e834c9"
+                "reference": "8c3698f03749be5e518a3c68cdb21690510377be"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ozami/coroq-flow/zipball/379117b1e52c9a1551219d046314ccd680e834c9",
-                "reference": "379117b1e52c9a1551219d046314ccd680e834c9",
+                "url": "https://api.github.com/repos/ozami/coroq-flow/zipball/8c3698f03749be5e518a3c68cdb21690510377be",
+                "reference": "8c3698f03749be5e518a3c68cdb21690510377be",
                 "shasum": ""
             },
             "require": {
+                "coroq/callable-reflector": "^1.0",
                 "php": ">=7.2",
                 "psr/container": "^1.0||^2.0"
             },
@@ -49,7 +92,7 @@
                 "issues": "https://github.com/ozami/coroq-flow/issues",
                 "source": "https://github.com/ozami/coroq-flow/tree/master"
             },
-            "time": "2023-04-14T09:42:47+00:00"
+            "time": "2023-04-15T15:12:50+00:00"
         },
         {
             "name": "psr/container",
