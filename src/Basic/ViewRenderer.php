@@ -1,19 +1,28 @@
 <?php
 namespace Coroq\HttpKernel\Basic;
 
+use InvalidArgumentException;
+
 class ViewRenderer {
   /** @var string */
   protected $template_directory;
 
   public function __construct(string $template_directory) {
-    $this->template_directory = $template_directory;
+    $this->template_directory = realpath($template_directory);
+    if ($this->template_directory === false) {
+      throw new InvalidArgumentException("Template directory $template_directory not found.");
+    }
   }
 
   public function render(string $__template_name, array $__arguments = []): string {
+    $template_file = "$this->template_directory/$__template_name";
+    if (!is_readable($template_file)) {
+      throw new InvalidArgumentException("Template file $__template_name in $this->template_directory is not readable.");
+    }
     try {
       ob_start();
       extract($__arguments);
-      include "$this->template_directory/$__template_name";
+      include $template_file;
       return ob_get_clean();
     }
     catch (\Throwable $error) {
