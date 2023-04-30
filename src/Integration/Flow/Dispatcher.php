@@ -14,7 +14,7 @@ class Dispatcher implements DispatcherInterface {
       throw new InvalidArgumentException();
     }
     $responder = new Responder($response);
-    $result = $controller(compact("response", "responder"));
+    $result = $controller(compact("request", "response", "responder"));
     if (isset($result["response"]) && !($result["response"] instanceof ResponseInterface)) {
       throw new DomainException("Controller must return an object of ResponseInterface for 'response' key.");
     }
