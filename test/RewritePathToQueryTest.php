@@ -65,4 +65,12 @@ class RewritePathToQueryTest extends TestCase {
     $this->assertEquals(["param" => "123"], $result->getQueryParams());
     $this->assertEquals("/abc/def/", $result->getUri()->getPath());
   }
+
+  public function testMatchPartialy() {
+    $rule = new PathToQuery("/abc/{param}");
+    $request = $this->makeRequest("/abc/123/def");
+    $result = $rule->rewrite($request);
+    $this->assertEquals(["param" => "123"], $result->getQueryParams());
+    $this->assertEquals("/abc/def", $result->getUri()->getPath());
+  }
 }

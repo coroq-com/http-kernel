@@ -16,11 +16,11 @@ class PathToQuery implements RuleInterface {
     $format = explode("/", ltrim($this->format, "/"));
     $newPath = [];
     $query = [];
-    foreach ($format as $index => $formatItem) {
-      if (!isset($path[$index])) {
+    foreach ($format as $formatItem) {
+      $pathItem = array_shift($path);
+      if ($pathItem === null) {
         return $request;
       }
-      $pathItem = $path[$index];
       if (preg_match('#^\{([a-z_][a-z0-9_]*)(:.+?)?\}$#i', $formatItem, $matches)) {
         $query[$matches[1]] = urldecode($pathItem);
         if (isset($matches[2])) {
@@ -34,6 +34,7 @@ class PathToQuery implements RuleInterface {
       }
       return $request;
     }
+    $newPath = array_merge($newPath, $path);
     $request = $request->withUri($request->getUri()->withPath("/" . join("/", $newPath)));
     $request = $request->withQueryParams($query + $request->getQueryParams());
     return $request;
