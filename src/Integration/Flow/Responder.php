@@ -1,6 +1,7 @@
 <?php
 namespace Coroq\HttpKernel\Integration\Flow;
 
+use Coroq\Flow\Flow;
 use InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
@@ -10,11 +11,15 @@ class Responder {
   /** @var ResponseInterface */
   private $response;
 
+  /** @var Flow */
+  private $controller;
+
   /** @var callable */
   private $jsonEncoder;
 
-  public function __construct(ResponseInterface $response, ?callable $jsonEncoder = null) {
+  public function __construct(ResponseInterface $response, Flow $controller, ?callable $jsonEncoder = null) {
     $this->response = $response;
+    $this->controller = $controller;
     $this->jsonEncoder = $jsonEncoder ?? [$this, "encodeJson"];
   }
 
@@ -23,6 +28,7 @@ class Responder {
    * @return array<string,ResponseInterface>
    */
   public function ok($body = null): array {
+    $this->controller->break();
     $response = $this->response->withStatus(200);
     $this->writeToResponseBody($response, $body);
     return compact("response");
@@ -33,6 +39,7 @@ class Responder {
    * @return array<string,ResponseInterface>
    */
   public function okJson($data): array {
+    $this->controller->break();
     $response = $this->response->withStatus(200);
     $response = $response->withHeader("Content-Type", "application/json");
     $response->getBody()->write(($this->jsonEncoder)($data));
@@ -43,6 +50,7 @@ class Responder {
    * @return array<string,ResponseInterface>
    */
   public function okDownload(StreamInterface $body, string $contentType, ?string $fileName = null): array {
+    $this->controller->break();
     $response = $this->response->withStatus(200);
     $response = $response->withHeader("Content-Type", $contentType);
     $dispositionHeader = "attachment;";
@@ -60,6 +68,7 @@ class Responder {
    * @return array<string,ResponseInterface>
    */
   public function found($url, array $query = [], string $fragment = null): array {
+    $this->controller->break();
     if ($query) {
       $url .= "?" . http_build_query($query);
     }
@@ -76,6 +85,7 @@ class Responder {
    * @return array<string,ResponseInterface>
    */
   public function forbidden($body = null): array {
+    $this->controller->break();
     $response = $this->response->withStatus(403);
     $this->writeToResponseBody($response, $body);
     return compact("response");
@@ -86,6 +96,7 @@ class Responder {
    * @return array<string,ResponseInterface>
    */
   public function notFound($body = null): array {
+    $this->controller->break();
     $response = $this->response->withStatus(404);
     $this->writeToResponseBody($response, $body);
     return compact("response");
@@ -96,6 +107,7 @@ class Responder {
    * @return array<string,ResponseInterface>
    */
   public function serviceUnavailable($body = null): array {
+    $this->controller->break();
     $response = $this->response->withStatus(503);
     $this->writeToResponseBody($response, $body);
     return compact("response");
