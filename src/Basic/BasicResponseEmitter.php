@@ -4,7 +4,7 @@ namespace Coroq\HttpKernel\Basic;
 use Coroq\HttpKernel\Component\ResponseEmitterInterface;
 use Psr\Http\Message\ResponseInterface;
 
-class ResponseEmitter implements ResponseEmitterInterface {
+class BasicResponseEmitter implements ResponseEmitterInterface {
   public function emitResponse(ResponseInterface $response): void {
     foreach ($response->getHeaders() as $name => $values) {
       foreach ($values as $value) {

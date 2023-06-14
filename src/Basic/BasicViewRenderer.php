@@ -3,7 +3,7 @@ namespace Coroq\HttpKernel\Basic;
 
 use InvalidArgumentException;
 
-class ViewRenderer {
+class BasicViewRenderer {
   /** @var string */
   protected $template_directory;
 

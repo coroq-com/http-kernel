@@ -1,5 +1,5 @@
 <?php
-namespace Coroq\HttpKernel\Basic\RequestRewriterRule;
+namespace Coroq\HttpKernel\Basic\BasicRequestRewriterRule;
 use Psr\Http\Message\ServerRequestInterface;
 
 class PathToQuery implements RuleInterface {

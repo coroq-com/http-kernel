@@ -1,5 +1,5 @@
 <?php
-use Coroq\HttpKernel\Basic\RequestRewriterRule\PathToQuery;
+use Coroq\HttpKernel\Basic\BasicRequestRewriterRule\PathToQuery;
 use Nyholm\Psr7\ServerRequest;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ServerRequestInterface;

@@ -6,7 +6,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 
-class Router implements RouterInterface {
+class BasicRouter implements RouterInterface {
   /** @var array<mixed> */
   private $map;
 

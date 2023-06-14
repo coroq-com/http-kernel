@@ -1,11 +1,11 @@
 <?php
 namespace Coroq\HttpKernel\Basic;
 
-use Coroq\HttpKernel\Basic\RequestRewriterRule\RuleInterface;
+use Coroq\HttpKernel\Basic\BasicRequestRewriterRule\RuleInterface;
 use Coroq\HttpKernel\Component\RequestRewriterInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class RequestRewriter implements RequestRewriterInterface {
+class BasicRequestRewriter implements RequestRewriterInterface {
   /** @var array<RuleInterface> */
   private $rules;
 

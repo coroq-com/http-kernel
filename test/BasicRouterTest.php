@@ -1,5 +1,5 @@
 <?php
-use Coroq\HttpKernel\Basic\Router;
+use Coroq\HttpKernel\Basic\BasicRouter;
 use Nyholm\Psr7\ServerRequest;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ServerRequestInterface;
@@ -13,37 +13,37 @@ class RouterTest extends TestCase {
   }
 
   public function testRoot() {
-    $router = new Router(["" => "root"]);
+    $router = new BasicRouter(["" => "root"]);
     $result = $router->route($this->makeRequest(""));
     $this->assertEquals(["root"], $result);
   }
 
   public function testNamedMapItem() {
-    $router = new Router(["" => "root", "abc" => "ABC"]);
+    $router = new BasicRouter(["" => "root", "abc" => "ABC"]);
     $result = $router->route($this->makeRequest("/abc"));
     $this->assertEquals(["ABC"], $result);
   }
 
   public function testNumericMapIndex() {
-    $router = new Router(["first", "" => "root", "last"]);
+    $router = new BasicRouter(["first", "" => "root", "last"]);
     $result = $router->route($this->makeRequest("/"));
     $this->assertEquals(["first", "root"], $result);
   }
 
   public function testCatchAllOnly() {
-    $router = new Router(["*"]);
+    $router = new BasicRouter(["*"]);
     $result = $router->route($this->makeRequest("/not_exists"));
     $this->assertEquals([], $result);
   }
 
   public function testCatchAllAfterSomeRoute() {
-    $router = new Router(["first", "*"]);
+    $router = new BasicRouter(["first", "*"]);
     $result = $router->route($this->makeRequest("/not_exists"));
     $this->assertEquals(["first"], $result);
   }
 
   public function testCatchAllAfterDigging() {
-    $router = new Router([
+    $router = new BasicRouter([
       "first" => [
         "*",
       ],
@@ -53,7 +53,7 @@ class RouterTest extends TestCase {
   }
 
   public function testCatchAllAfterDiggingAndSomeRoute() {
-    $router = new Router([
+    $router = new BasicRouter([
       "first" => [
         "second",
         "*",
@@ -64,7 +64,7 @@ class RouterTest extends TestCase {
   }
 
   public function testCatchAllAfterDiggingAndDeadEnd() {
-    $router = new Router([
+    $router = new BasicRouter([
       "first" => [
         "second",
       ],
@@ -75,7 +75,7 @@ class RouterTest extends TestCase {
   }
 
   public function testCatchAllAfterDiggingAndDeadEndAndSomeRoute() {
-    $router = new Router([
+    $router = new BasicRouter([
       "first" => [
         "second",
       ],
@@ -87,13 +87,13 @@ class RouterTest extends TestCase {
   }
 
   public function testDeadEnd() {
-    $router = new Router(["first", "" => "root", "last"]);
+    $router = new BasicRouter(["first", "" => "root", "last"]);
     $result = $router->route($this->makeRequest("/not_exists"));
     $this->assertEquals([], $result);
   }
 
   public function testDeepMap() {
-    $router = new Router([
+    $router = new BasicRouter([
       "1st",
       "2nd",
       "flower" => [
@@ -123,7 +123,7 @@ class RouterTest extends TestCase {
   }
 
   public function testDeepMapDeadEnd() {
-    $router = new Router([
+    $router = new BasicRouter([
       "1st",
       "2nd",
       "flower" => [
@@ -153,7 +153,7 @@ class RouterTest extends TestCase {
   }
 
   public function testDefaultClassName() {
-    $router = new Router([
+    $router = new BasicRouter([
       "::no_class_name",
       "abc" => [
         "SomeClass::",
@@ -166,7 +166,7 @@ class RouterTest extends TestCase {
   }
 
   public function testDefaultMethodName() {
-    $router = new Router([
+    $router = new BasicRouter([
       "::",
       "abc" => [
         "SomeClass::",
