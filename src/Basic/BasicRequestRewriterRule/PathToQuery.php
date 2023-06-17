@@ -1,42 +1,96 @@
 <?php
+declare(strict_types=1);
 namespace Coroq\HttpKernel\Basic\BasicRequestRewriterRule;
+
+use Closure;
 use Psr\Http\Message\ServerRequestInterface;
 
 class PathToQuery implements RuleInterface {
   /** @var string */
-  protected $format;
+  private $format;
 
-  public function __construct(string $format) {
+  /** @var array<string,PathToQueryOption> */
+  private $options;
+
+  /**
+   * @param string $format Format string for path of URL with placeholders
+   * @param array<string,PathToQueryOption> $options the keys are the name of placeholder
+   */
+  public function __construct(string $format, array $options = []) {
     $this->format = $format;
+    $this->options = $options;
   }
 
   public function rewrite(ServerRequestInterface $request): ServerRequestInterface {
     $path = $request->getUri()->getPath();
-    $path = explode("/", ltrim($path, "/")); // assuming path is absolute
-    $format = explode("/", ltrim($this->format, "/"));
-    $newPath = [];
-    $query = [];
-    foreach ($format as $formatItem) {
-      $pathItem = array_shift($path);
-      if ($pathItem === null) {
-        return $request;
-      }
-      if (preg_match('#^\{([a-z_][a-z0-9_]*)(:.+?)?\}$#i', $formatItem, $matches)) {
-        $query[$matches[1]] = urldecode($pathItem);
-        if (isset($matches[2])) {
-          $newPath[] = substr($matches[2], 1);
-        }
-        continue;
-      }
-      if ($formatItem === "" || $pathItem == $formatItem) {
-        $newPath[] = $pathItem;
-        continue;
-      }
+    // check if the path matches the format and get values from path
+    $pattern = preg_quote($this->format);
+    $pattern = preg_replace('#\\\\{([a-z_][a-z0-9_]*)\\\\}#ui', '(?P<$1>[^/]*)', $pattern);
+    $pattern = '#\A' . $pattern . '#u';
+    if (!preg_match($pattern, $path, $pathMatches)) {
       return $request;
     }
-    $newPath = array_merge($newPath, $path);
-    $request = $request->withUri($request->getUri()->withPath("/" . join("/", $newPath)));
-    $request = $request->withQueryParams($query + $request->getQueryParams());
+    $matchedPathLength = strlen($pathMatches[0]);
+    $values = [];
+    foreach ($pathMatches as $placeholderName => $value) {
+      if (!is_string($placeholderName)) {
+        continue;
+      }
+      $values[$placeholderName] = urldecode($value);
+    }
+    // complement default value for empty values
+    foreach ($values as $placeholderName => $value) {
+      if ($value === '' && isset($this->options[$placeholderName]->default)) {
+        $values[$placeholderName] = $this->options[$placeholderName]->default;
+      }
+    }
+    // validate values
+    foreach ($values as $placeholderName => $value) {
+      if (!$this->assertValueConformsToFormat($placeholderName, $value)) {
+        return $request;
+      }
+    }
+    // replace
+    $replaced = preg_replace_callback('#\{([a-z_][a-z0-9_]*)\}#ui', function($matches): string {
+      $placehodlerName = $matches[1];
+      assert(is_string($placehodlerName));
+      $replacement = $this->options[$placehodlerName]->replacement ?? null;
+      $replacement = $replacement ?? $placehodlerName;
+      return $replacement;
+    }, $this->format);
+    $newPath = substr_replace($path, $replaced, 0, $matchedPathLength);
+    // update the request
+    $request = $request->withUri($request->getUri()->withPath($newPath));
+    $request = $request->withQueryParams($values + $request->getQueryParams());
     return $request;
+  }
+
+  public static function notEmpty(): Closure {
+    return function(string $value): bool {
+      return $value !== "";
+    };
+  }
+
+  public static function positiveInteger(): Closure {
+    return function(string $value): bool {
+      if ((string)intval($value) !== $value) {
+        return false;
+      }
+      return 0 < intval($value);
+    };
+  }
+
+  public static function matchesPattern(string $pattern): Closure {
+    return function(string $value) use ($pattern): bool {
+      return (bool)preg_match($pattern, $value);
+    };
+  }
+
+  private function assertValueConformsToFormat(string $name, string $value): bool {
+    $format = $this->options[$name]->format ?? null;
+    if ($format === null) {
+      return true;
+    }
+    return (bool)$format($value, $name);
   }
 }
