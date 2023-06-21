@@ -2,7 +2,6 @@
 declare(strict_types=1);
 namespace Coroq\HttpKernel\Basic\BasicRequestRewriterRule;
 
-use Closure;
 use Psr\Http\Message\ServerRequestInterface;
 
 class PathToQuery implements RuleInterface {
@@ -63,27 +62,6 @@ class PathToQuery implements RuleInterface {
     $request = $request->withUri($request->getUri()->withPath($newPath));
     $request = $request->withQueryParams($values + $request->getQueryParams());
     return $request;
-  }
-
-  public static function notEmpty(): Closure {
-    return function(string $value): bool {
-      return $value !== "";
-    };
-  }
-
-  public static function positiveInteger(): Closure {
-    return function(string $value): bool {
-      if ((string)intval($value) !== $value) {
-        return false;
-      }
-      return 0 < intval($value);
-    };
-  }
-
-  public static function matchesPattern(string $pattern): Closure {
-    return function(string $value) use ($pattern): bool {
-      return (bool)preg_match($pattern, $value);
-    };
   }
 
   private function assertValueConformsToFormat(string $name, string $value): bool {
