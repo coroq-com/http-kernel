@@ -14,7 +14,7 @@
         "psr/http-message": "^1.0||^2.0",
         "psr/container": "^1.0||^2.0",
         "psr/log": "^1.0||^2.0||^3.0",
-        "coroq/flow": "dev-master"
+        "coroq/flow": "^7.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^8.5",
