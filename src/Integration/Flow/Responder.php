@@ -49,7 +49,7 @@ class Responder {
   /**
    * @return array<string,ResponseInterface>
    */
-  public function okDownload(StreamInterface $body, string $contentType, ?string $fileName = null): array {
+  public function okDownload(StreamInterface|string $body, string $contentType, ?string $fileName = null): array {
     $this->controller->break();
     $response = $this->response->withStatus(200);
     $response = $response->withHeader("Content-Type", $contentType);
@@ -58,7 +58,12 @@ class Responder {
       $dispositionHeader .= "filename='$fileName';filename*=UTF-8''" . rawurlencode($fileName);
     }
     $response = $response->withHeader("Content-Disposition", $dispositionHeader);
-    $response = $response->withBody($body);
+    if ($body instanceof StreamInterface) {
+      $response = $response->withBody($body);
+    }
+    else {
+      $response->getBody()->write($body);
+    }
     return compact("response");
   }
 
