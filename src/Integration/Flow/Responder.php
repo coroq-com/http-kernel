@@ -55,7 +55,7 @@ class Responder {
     $response = $response->withHeader("Content-Type", $contentType);
     $dispositionHeader = "attachment;";
     if ($fileName !== null) {
-      $dispositionHeader .= "filename='$fileName';filename*=UTF-8''" . rawurlencode($fileName);
+      $dispositionHeader .= "filename*=UTF-8''" . rawurlencode($fileName);
     }
     $response = $response->withHeader("Content-Disposition", $dispositionHeader);
     if ($body instanceof StreamInterface) {
