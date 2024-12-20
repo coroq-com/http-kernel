@@ -47,9 +47,10 @@ class Responder {
   }
 
   /**
+   * @param string|StreamInterface $body
    * @return array<string,ResponseInterface>
    */
-  public function okDownload(StreamInterface|string $body, string $contentType, ?string $fileName = null): array {
+  public function okDownload($body, string $contentType, ?string $fileName = null): array {
     $this->controller->break();
     $response = $this->response->withStatus(200);
     $response = $response->withHeader("Content-Type", $contentType);
