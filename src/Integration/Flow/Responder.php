@@ -81,7 +81,7 @@ class Responder {
     if ($fragment !== null) {
       $url .= "#$fragment";
     }
-    $response = $this->response->withStatus(301);
+    $response = $this->response->withStatus(302);
     $response = $response->withHeader("Location", $url);
     return compact("response");
   }
